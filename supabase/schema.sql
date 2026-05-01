@@ -109,6 +109,13 @@ language plpgsql
 security definer
 as $$
 begin
+  if not exists (
+    select 1 from business_profiles
+    where id = p_profile_id and user_id = auth.uid()
+  ) then
+    raise exception 'Not authorized to modify this profile';
+  end if;
+
   update feedbacks set business_slug = p_new_slug where business_slug = p_old_slug;
   update business_profiles
     set business_name = p_business_name,
