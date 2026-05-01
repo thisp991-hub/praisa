@@ -76,6 +76,12 @@ export async function saveBusinessProfile(formData: {
       .eq("id", existing.id);
 
     if (error) {
+      if (oldSlug && oldSlug !== slug) {
+        await supabase
+          .from("feedbacks")
+          .update({ business_slug: oldSlug })
+          .eq("business_slug", slug);
+      }
       return { success: false, error: error.message };
     }
   } else {
