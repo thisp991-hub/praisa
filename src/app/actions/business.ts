@@ -55,6 +55,13 @@ export async function saveBusinessProfile(formData: {
   if (existing) {
     const oldSlug = existing.business_slug;
 
+    if (oldSlug && oldSlug !== slug) {
+      await supabase
+        .from("feedbacks")
+        .update({ business_slug: slug })
+        .eq("business_slug", oldSlug);
+    }
+
     const { error } = await supabase
       .from("business_profiles")
       .update({
@@ -66,13 +73,6 @@ export async function saveBusinessProfile(formData: {
 
     if (error) {
       return { success: false, error: error.message };
-    }
-
-    if (oldSlug && oldSlug !== slug) {
-      await supabase
-        .from("feedbacks")
-        .update({ business_slug: slug })
-        .eq("business_slug", oldSlug);
     }
   } else {
     const { error } = await supabase.from("business_profiles").insert({
