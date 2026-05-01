@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Star } from "lucide-react";
 import { submitFeedback } from "@/app/actions/feedback";
 
@@ -24,6 +24,20 @@ export function FeedbackForm({
 
   const isPositive = rating >= 4;
   const isNegative = rating >= 1 && rating <= 3;
+  const positiveSubmitted = useRef(false);
+
+  useEffect(() => {
+    if (isPositive && !positiveSubmitted.current) {
+      positiveSubmitted.current = true;
+      submitFeedback({
+        business_slug: businessSlug,
+        rating,
+        feedback_text: undefined,
+        name: undefined,
+        email: undefined,
+      });
+    }
+  }, [isPositive, rating, businessSlug]);
 
   async function handleSubmitFeedback(e: React.FormEvent) {
     e.preventDefault();

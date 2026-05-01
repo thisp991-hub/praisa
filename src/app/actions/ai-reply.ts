@@ -1,8 +1,18 @@
 "use server";
 
 import OpenAI from "openai";
+import { createClient } from "@/lib/supabase/server";
 
 export async function generateReply(reviewText: string, tone: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
+
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
