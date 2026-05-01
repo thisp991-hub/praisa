@@ -56,10 +56,14 @@ export async function saveBusinessProfile(formData: {
     const oldSlug = existing.business_slug;
 
     if (oldSlug && oldSlug !== slug) {
-      await supabase
+      const { error: feedbackError } = await supabase
         .from("feedbacks")
         .update({ business_slug: slug })
         .eq("business_slug", oldSlug);
+
+      if (feedbackError) {
+        return { success: false, error: feedbackError.message };
+      }
     }
 
     const { error } = await supabase

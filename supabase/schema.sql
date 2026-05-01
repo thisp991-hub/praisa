@@ -63,7 +63,8 @@ create policy "Business owners can update their feedback"
       where business_profiles.business_slug = feedbacks.business_slug
       and business_profiles.user_id = auth.uid()
     )
-  );
+  )
+  with check (true);
 
 -- Public read access for business profiles (needed for feedback page)
 create policy "Anyone can view business profiles by slug"

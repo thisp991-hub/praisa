@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import QRCode from "qrcode";
 import { Download } from "lucide-react";
+
+const subscribe = () => () => {};
+const getOrigin = () => window.location.origin;
+const getServerOrigin = () => "";
 
 interface QRCodeGeneratorProps {
   businessSlug: string;
@@ -14,13 +18,10 @@ export function QRCodeGenerator({
   businessName,
 }: QRCodeGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const feedbackUrl = useMemo(
-    () =>
-      typeof window !== "undefined"
-        ? `${window.location.origin}/feedback/${businessSlug}`
-        : `/feedback/${businessSlug}`,
-    [businessSlug]
-  );
+  const origin = useSyncExternalStore(subscribe, getOrigin, getServerOrigin);
+  const feedbackUrl = origin
+    ? `${origin}/feedback/${businessSlug}`
+    : `/feedback/${businessSlug}`;
 
   useEffect(() => {
     if (canvasRef.current) {
