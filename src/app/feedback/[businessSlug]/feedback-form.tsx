@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Star } from "lucide-react";
 import { submitFeedback } from "@/app/actions/feedback";
 
@@ -24,20 +24,29 @@ export function FeedbackForm({
 
   const isPositive = rating >= 4;
   const isNegative = rating >= 1 && rating <= 3;
-  const positiveSubmitted = useRef(false);
+  const [positiveConfirmed, setPositiveConfirmed] = useState(false);
 
-  useEffect(() => {
-    if (isPositive && !positiveSubmitted.current) {
-      positiveSubmitted.current = true;
-      submitFeedback({
-        business_slug: businessSlug,
-        rating,
-        feedback_text: undefined,
-        name: undefined,
-        email: undefined,
-      });
+  async function handleConfirmPositive() {
+    setLoading(true);
+    setError(null);
+
+    const result = await submitFeedback({
+      business_slug: businessSlug,
+      rating,
+      feedback_text: undefined,
+      name: undefined,
+      email: undefined,
+    });
+
+    setLoading(false);
+
+    if (!result.success) {
+      setError(result.error || "Something went wrong.");
+      return;
     }
-  }, [isPositive, rating, businessSlug]);
+
+    setPositiveConfirmed(true);
+  }
 
   async function handleSubmitFeedback(e: React.FormEvent) {
     e.preventDefault();
@@ -124,11 +133,35 @@ export function FeedbackForm({
         </div>
       </div>
 
-      {/* Positive Rating: Redirect to Google */}
-      {isPositive && (
+      {/* Positive Rating: Confirm then redirect to Google */}
+      {isPositive && !positiveConfirmed && (
         <div className="text-center">
           <p className="mb-4 text-lg font-medium text-gray-900">
             Thank you! We&apos;re glad you had a great experience.
+          </p>
+
+          {error && (
+            <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={handleConfirmPositive}
+            disabled={loading}
+            className="rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
+          >
+            {loading ? "Submitting..." : "Submit Rating"}
+          </button>
+        </div>
+      )}
+
+      {/* After positive rating confirmed: show Google review link */}
+      {isPositive && positiveConfirmed && (
+        <div className="text-center">
+          <p className="mb-4 text-lg font-medium text-gray-900">
+            Rating submitted! Thank you.
           </p>
           <p className="mb-6 text-sm text-gray-600">
             Would you mind leaving us a Google review? It really helps!
