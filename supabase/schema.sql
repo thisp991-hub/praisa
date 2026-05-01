@@ -60,7 +60,34 @@ create policy "Anyone can view business profiles by slug"
   on business_profiles for select
   using (true);
 
+-- Saved AI replies table
+create table if not exists saved_replies (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  review_text text not null,
+  reply_text text not null,
+  tone text not null,
+  created_at timestamptz default now() not null
+);
+
+-- Enable RLS for saved replies
+alter table saved_replies enable row level security;
+
+-- Saved replies: users can only manage their own replies
+create policy "Users can view own replies"
+  on saved_replies for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert own replies"
+  on saved_replies for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can delete own replies"
+  on saved_replies for delete
+  using (auth.uid() = user_id);
+
 -- Index for faster slug lookups
 create index if not exists idx_feedbacks_business_slug on feedbacks(business_slug);
 create index if not exists idx_business_profiles_slug on business_profiles(business_slug);
 create index if not exists idx_business_profiles_user_id on business_profiles(user_id);
+create index if not exists idx_saved_replies_user_id on saved_replies(user_id);

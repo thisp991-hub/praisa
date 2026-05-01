@@ -16,3 +16,12 @@ export interface BusinessProfile {
   google_review_link: string | null;
   created_at: string;
 }
+
+export interface SavedReply {
+  id: string;
+  user_id: string;
+  review_text: string;
+  reply_text: string;
+  tone: string;
+  created_at: string;
+}
