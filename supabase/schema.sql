@@ -97,6 +97,27 @@ create policy "Users can delete own replies"
   on saved_replies for delete
   using (auth.uid() = user_id);
 
+-- RPC for atomic slug migration (bypasses RLS timing issues)
+create or replace function migrate_business_slug(
+  p_profile_id uuid,
+  p_old_slug text,
+  p_new_slug text,
+  p_business_name text,
+  p_google_review_link text
+) returns void
+language plpgsql
+security definer
+as $$
+begin
+  update feedbacks set business_slug = p_new_slug where business_slug = p_old_slug;
+  update business_profiles
+    set business_name = p_business_name,
+        business_slug = p_new_slug,
+        google_review_link = p_google_review_link
+    where id = p_profile_id;
+end;
+$$;
+
 -- Index for faster slug lookups
 create index if not exists idx_feedbacks_business_slug on feedbacks(business_slug);
 create index if not exists idx_business_profiles_slug on business_profiles(business_slug);

@@ -56,33 +56,30 @@ export async function saveBusinessProfile(formData: {
     const oldSlug = existing.business_slug;
 
     if (oldSlug && oldSlug !== slug) {
-      const { error: feedbackError } = await supabase
-        .from("feedbacks")
-        .update({ business_slug: slug })
-        .eq("business_slug", oldSlug);
+      const { error } = await supabase.rpc("migrate_business_slug", {
+        p_profile_id: existing.id,
+        p_old_slug: oldSlug,
+        p_new_slug: slug,
+        p_business_name: formData.business_name,
+        p_google_review_link: formData.google_review_link || null,
+      });
 
-      if (feedbackError) {
-        return { success: false, error: feedbackError.message };
+      if (error) {
+        return { success: false, error: error.message };
       }
-    }
+    } else {
+      const { error } = await supabase
+        .from("business_profiles")
+        .update({
+          business_name: formData.business_name,
+          business_slug: slug,
+          google_review_link: formData.google_review_link || null,
+        })
+        .eq("id", existing.id);
 
-    const { error } = await supabase
-      .from("business_profiles")
-      .update({
-        business_name: formData.business_name,
-        business_slug: slug,
-        google_review_link: formData.google_review_link || null,
-      })
-      .eq("id", existing.id);
-
-    if (error) {
-      if (oldSlug && oldSlug !== slug) {
-        await supabase
-          .from("feedbacks")
-          .update({ business_slug: oldSlug })
-          .eq("business_slug", slug);
+      if (error) {
+        return { success: false, error: error.message };
       }
-      return { success: false, error: error.message };
     }
   } else {
     const { error } = await supabase.from("business_profiles").insert({
