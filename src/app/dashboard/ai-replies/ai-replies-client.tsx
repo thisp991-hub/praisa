@@ -29,7 +29,7 @@ export function AIRepliesClient({
         </p>
         <div className="mt-4">
           <SavedRepliesList
-            initialReplies={replies}
+            replies={replies}
             onReplyDeleted={refreshReplies}
           />
         </div>

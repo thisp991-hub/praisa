@@ -48,11 +48,13 @@ export async function saveBusinessProfile(formData: {
 
   const { data: existing } = await supabase
     .from("business_profiles")
-    .select("id")
+    .select("id, business_slug")
     .eq("user_id", user.id)
     .single();
 
   if (existing) {
+    const oldSlug = existing.business_slug;
+
     const { error } = await supabase
       .from("business_profiles")
       .update({
@@ -64,6 +66,13 @@ export async function saveBusinessProfile(formData: {
 
     if (error) {
       return { success: false, error: error.message };
+    }
+
+    if (oldSlug && oldSlug !== slug) {
+      await supabase
+        .from("feedbacks")
+        .update({ business_slug: slug })
+        .eq("business_slug", oldSlug);
     }
   } else {
     const { error } = await supabase.from("business_profiles").insert({

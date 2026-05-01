@@ -6,13 +6,12 @@ import { deleteReply } from "@/app/actions/saved-replies";
 import type { SavedReply } from "@/lib/types";
 
 export function SavedRepliesList({
-  initialReplies,
+  replies,
   onReplyDeleted,
 }: {
-  initialReplies: SavedReply[];
+  replies: SavedReply[];
   onReplyDeleted: () => void;
 }) {
-  const [replies, setReplies] = useState(initialReplies);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -27,7 +26,6 @@ export function SavedRepliesList({
     const result = await deleteReply(id);
 
     if (result.success) {
-      setReplies((prev) => prev.filter((r) => r.id !== id));
       onReplyDeleted();
     }
 
