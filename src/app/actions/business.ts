@@ -65,10 +65,14 @@ export async function saveBusinessProfile(formData: {
 
       // Update logo_url separately (not part of the RPC)
       if (formData.logo_url !== undefined) {
-        await supabase
+        const { error: logoError } = await supabase
           .from("business_profiles")
           .update({ logo_url: formData.logo_url || null })
           .eq("id", existing.id);
+
+        if (logoError) {
+          return { success: false, error: logoError.message };
+        }
       }
     } else {
       const { error } = await supabase

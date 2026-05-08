@@ -63,19 +63,9 @@ export function CustomersClient({
       return;
     }
 
-    setCustomers((prev) => [
-      {
-        id: crypto.randomUUID(),
-        user_id: "",
-        business_slug: businessSlug,
-        name: name.trim(),
-        phone: phone.trim() || null,
-        email: email.trim() || null,
-        status: "not_requested",
-        created_at: new Date().toISOString(),
-      },
-      ...prev,
-    ]);
+    if (result.customer) {
+      setCustomers((prev) => [result.customer!, ...prev]);
+    }
 
     setName("");
     setPhone("");

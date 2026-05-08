@@ -151,6 +151,7 @@ begin
   end if;
 
   update feedbacks set business_slug = p_new_slug where business_slug = p_old_slug;
+  update customers set business_slug = p_new_slug where business_slug = p_old_slug;
   update business_profiles
     set business_name = p_business_name,
         business_slug = p_new_slug,

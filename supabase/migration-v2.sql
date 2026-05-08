@@ -41,3 +41,32 @@ CREATE POLICY "Users can delete own customers"
 
 CREATE INDEX IF NOT EXISTS idx_customers_user_id ON customers(user_id);
 CREATE INDEX IF NOT EXISTS idx_customers_business_slug ON customers(business_slug);
+
+-- 4. Update slug migration RPC to also migrate customers
+CREATE OR REPLACE FUNCTION migrate_business_slug(
+  p_profile_id uuid,
+  p_old_slug text,
+  p_new_slug text,
+  p_business_name text,
+  p_google_review_link text
+) RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM business_profiles
+    WHERE id = p_profile_id AND user_id = auth.uid()
+  ) THEN
+    RAISE EXCEPTION 'Not authorized to modify this profile';
+  END IF;
+
+  UPDATE feedbacks SET business_slug = p_new_slug WHERE business_slug = p_old_slug;
+  UPDATE customers SET business_slug = p_new_slug WHERE business_slug = p_old_slug;
+  UPDATE business_profiles
+    SET business_name = p_business_name,
+        business_slug = p_new_slug,
+        google_review_link = p_google_review_link
+    WHERE id = p_profile_id;
+END;
+$$;
