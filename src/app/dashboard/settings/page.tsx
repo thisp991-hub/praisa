@@ -15,6 +15,7 @@ export default async function SettingsPage() {
         <SettingsForm
           initialName={profile?.business_name || ""}
           initialGoogleLink={profile?.google_review_link || ""}
+          initialLogoUrl={profile?.logo_url || ""}
           currentSlug={profile?.business_slug || null}
         />
       </div>

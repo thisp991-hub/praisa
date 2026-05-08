@@ -11,7 +11,7 @@ export default async function FeedbackPage({
 
   if (!business) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">
             Business not found
@@ -25,9 +25,19 @@ export default async function FeedbackPage({
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-8">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white px-4 py-8">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
+          {business.logo_url && (
+            <div className="mb-4 flex justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={business.logo_url}
+                alt={`${business.business_name} logo`}
+                className="h-16 w-16 rounded-full object-cover shadow-sm"
+              />
+            </div>
+          )}
           <h1 className="text-2xl font-bold text-gray-900">
             {business.business_name}
           </h1>
@@ -37,6 +47,9 @@ export default async function FeedbackPage({
           businessSlug={businessSlug}
           googleReviewLink={business.google_review_link}
         />
+        <p className="mt-6 text-center text-xs text-gray-400">
+          Powered by Praisa
+        </p>
       </div>
     </div>
   );

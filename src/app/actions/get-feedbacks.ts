@@ -1,8 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import type { Feedback } from "@/lib/types";
 
-export async function getFeedbacks() {
+export async function getFeedbacks(): Promise<Feedback[]> {
   const supabase = await createClient();
 
   const {
@@ -29,13 +30,5 @@ export async function getFeedbacks() {
     .eq("business_slug", profile.business_slug)
     .order("created_at", { ascending: false });
 
-  return (feedbacks || []) as {
-    id: string;
-    business_slug: string;
-    rating: number;
-    feedback_text: string | null;
-    name: string | null;
-    email: string | null;
-    created_at: string;
-  }[];
+  return (feedbacks || []) as Feedback[];
 }

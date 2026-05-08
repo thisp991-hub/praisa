@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { submitFeedback } from "@/app/actions/feedback";
+import { ISSUE_CATEGORIES } from "@/lib/types";
 
 interface FeedbackFormProps {
   businessSlug: string;
@@ -18,6 +19,7 @@ export function FeedbackForm({
   const [feedbackText, setFeedbackText] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [category, setCategory] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,9 +35,6 @@ export function FeedbackForm({
     const result = await submitFeedback({
       business_slug: businessSlug,
       rating,
-      feedback_text: undefined,
-      name: undefined,
-      email: undefined,
     });
 
     setLoading(false);
@@ -64,6 +63,7 @@ export function FeedbackForm({
       feedback_text: feedbackText,
       name: name || undefined,
       email: email || undefined,
+      category: category || undefined,
     });
 
     setLoading(false);
@@ -78,7 +78,7 @@ export function FeedbackForm({
 
   if (submitted) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
+      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <svg
             className="h-8 w-8 text-green-600"
@@ -105,7 +105,7 @@ export function FeedbackForm({
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6">
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
       {/* Star Rating */}
       <div className="mb-6">
         <p className="mb-3 text-center text-sm font-medium text-gray-700">
@@ -116,7 +116,10 @@ export function FeedbackForm({
             <button
               key={star}
               type="button"
-              onClick={() => setRating(star)}
+              onClick={() => {
+                setRating(star);
+                setPositiveConfirmed(false);
+              }}
               onMouseEnter={() => setHoveredRating(star)}
               onMouseLeave={() => setHoveredRating(0)}
               className="rounded-lg p-1 transition-transform hover:scale-110 active:scale-95"
@@ -136,8 +139,32 @@ export function FeedbackForm({
       {/* Positive Rating: Confirm then redirect to Google */}
       {isPositive && !positiveConfirmed && (
         <div className="text-center">
-          <p className="mb-4 text-lg font-medium text-gray-900">
-            Thank you! We&apos;re glad you had a great experience.
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+            <svg
+              className="h-6 w-6 text-green-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H5a2 2 0 01-2-2v-7a2 2 0 012-2h2.5"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7.5 11V5a3 3 0 016 0v6"
+              />
+            </svg>
+          </div>
+          <p className="mb-2 text-lg font-semibold text-gray-900">
+            Awesome! Glad you had a great experience.
+          </p>
+          <p className="mb-5 text-sm text-gray-500">
+            Tap below to confirm your {rating}-star rating.
           </p>
 
           {error && (
@@ -160,7 +187,22 @@ export function FeedbackForm({
       {/* After positive rating confirmed: show Google review link */}
       {isPositive && positiveConfirmed && (
         <div className="text-center">
-          <p className="mb-4 text-lg font-medium text-gray-900">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+            <svg
+              className="h-6 w-6 text-green-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <p className="mb-2 text-lg font-semibold text-gray-900">
             Rating submitted! Thank you.
           </p>
           <p className="mb-6 text-sm text-gray-600">
@@ -183,19 +225,44 @@ export function FeedbackForm({
         </div>
       )}
 
-      {/* Negative Rating: Private Feedback Form */}
+      {/* Negative Rating: Category + Private Feedback Form */}
       {isNegative && (
         <form onSubmit={handleSubmitFeedback} className="space-y-4">
-          <p className="text-center text-sm text-gray-600">
-            We&apos;re sorry to hear that. Please share your feedback so we can
-            improve.
-          </p>
+          <div className="rounded-lg bg-blue-50 p-3">
+            <p className="text-center text-xs text-blue-700">
+              🔒 Your feedback goes privately to the business owner and is not
+              posted publicly.
+            </p>
+          </div>
 
           {error && (
             <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
               {error}
             </div>
           )}
+
+          <div>
+            <label
+              htmlFor="category"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              What was the issue?{" "}
+              <span className="text-gray-400">(optional)</span>
+            </label>
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            >
+              <option value="">Select a category</option>
+              {ISSUE_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <div>
             <label
