@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Star, MessageSquare, QrCode, Sparkles } from "lucide-react";
+import { Star, ShieldCheck, QrCode } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
       {/* Navbar */}
       <header className="border-b border-gray-100">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -28,14 +28,15 @@ export default function Home() {
       </header>
 
       {/* Hero */}
-      <section className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
-        <h1 className="max-w-2xl text-5xl font-bold leading-tight tracking-tight text-gray-900">
-          Turn customer feedback into&nbsp;
-          <span className="text-primary">5-star growth</span>
+      <section className="flex flex-col items-center justify-center px-6 py-24 text-center">
+        <h1 className="max-w-3xl text-5xl font-bold leading-tight tracking-tight text-gray-900">
+          Get More Real Google Reviews —{" "}
+          <span className="text-primary">Without Chasing Customers</span>
         </h1>
-        <p className="mt-6 max-w-lg text-lg text-gray-600">
-          Collect reviews via QR codes, respond with AI, and manage your
-          reputation — all from one dashboard.
+        <p className="mt-6 max-w-2xl text-lg text-gray-600">
+          Praisa helps local businesses collect real customer feedback through QR
+          codes, send happy customers to Google reviews, and capture unhappy
+          feedback privately.
         </p>
         <div className="mt-10 flex gap-4">
           <Link
@@ -45,41 +46,36 @@ export default function Home() {
             Start Free Trial
           </Link>
           <Link
-            href="#pricing"
+            href="#how-it-works"
             className="rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
           >
-            View Pricing
+            See How It Works
           </Link>
         </div>
       </section>
 
-      {/* Features */}
+      {/* Benefit Cards */}
       <section className="border-t border-gray-100 bg-gray-50 px-6 py-20">
         <div className="mx-auto max-w-5xl">
           <h2 className="mb-12 text-center text-3xl font-bold text-gray-900">
-            Everything you need
+            Why businesses choose Praisa
           </h2>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-8 sm:grid-cols-3">
             {[
               {
-                icon: QrCode,
-                title: "QR Codes",
-                desc: "Generate scannable codes for instant feedback collection.",
-              },
-              {
-                icon: MessageSquare,
-                title: "Feedback",
-                desc: "Centralize and manage all customer reviews in one place.",
-              },
-              {
-                icon: Sparkles,
-                title: "AI Replies",
-                desc: "Craft professional responses powered by AI in seconds.",
-              },
-              {
                 icon: Star,
-                title: "Reputation",
-                desc: "Track ratings and grow your online reputation effortlessly.",
+                title: "More Real Reviews",
+                desc: "Automatically direct happy customers to leave Google reviews — boosting your online reputation with genuine 5-star ratings.",
+              },
+              {
+                icon: ShieldCheck,
+                title: "Private Negative Feedback",
+                desc: "Unhappy customers share feedback privately with you instead of posting negative reviews online. Fix issues before they go public.",
+              },
+              {
+                icon: QrCode,
+                title: "QR Code Review Flow",
+                desc: "Generate a simple QR code for your counter, receipt, or table. Customers scan, rate, and you capture every experience.",
               },
             ].map((f) => (
               <div
@@ -90,7 +86,52 @@ export default function Home() {
                 <h3 className="mb-2 text-lg font-semibold text-gray-900">
                   {f.title}
                 </h3>
-                <p className="text-sm text-gray-600">{f.desc}</p>
+                <p className="text-sm leading-relaxed text-gray-600">
+                  {f.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section id="how-it-works" className="px-6 py-20">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="mb-4 text-center text-3xl font-bold text-gray-900">
+            How it works
+          </h2>
+          <p className="mb-12 text-center text-gray-600">
+            Three simple steps to start collecting feedback today.
+          </p>
+          <div className="grid gap-8 sm:grid-cols-3">
+            {[
+              {
+                step: "1",
+                title: "Create your feedback QR code",
+                desc: "Sign up, enter your business name, and your personalized QR code is ready in seconds.",
+              },
+              {
+                step: "2",
+                title: "Customers scan and rate",
+                desc: "Place the QR code at your counter, receipt, or waiting area. Customers scan and rate their experience.",
+              },
+              {
+                step: "3",
+                title: "Happy → Google, Unhappy → Private",
+                desc: "Customers who rate 4-5 stars are sent to Google Reviews. Those who rate 1-3 stars leave private feedback just for you.",
+              },
+            ].map((s) => (
+              <div key={s.step} className="text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-white">
+                  {s.step}
+                </div>
+                <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                  {s.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-gray-600">
+                  {s.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -98,7 +139,10 @@ export default function Home() {
       </section>
 
       {/* Pricing Placeholder */}
-      <section id="pricing" className="px-6 py-20">
+      <section
+        id="pricing"
+        className="border-t border-gray-100 bg-gray-50 px-6 py-20"
+      >
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold text-gray-900">
             Simple, transparent pricing
@@ -110,7 +154,7 @@ export default function Home() {
             {["Starter", "Pro", "Enterprise"].map((plan) => (
               <div
                 key={plan}
-                className="rounded-xl border border-gray-200 p-8"
+                className="rounded-xl border border-gray-200 bg-white p-8"
               >
                 <h3 className="text-lg font-semibold text-gray-900">{plan}</h3>
                 <p className="mt-2 text-3xl font-bold text-gray-900">—</p>
