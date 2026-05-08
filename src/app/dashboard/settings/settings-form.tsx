@@ -4,6 +4,26 @@ import { useState } from "react";
 import { saveBusinessProfile } from "@/app/actions/business";
 import { generateSlug } from "@/lib/utils";
 
+function friendlyError(raw: string | undefined): string {
+  if (!raw) return "Something went wrong. Please try again.";
+  const lower = raw.toLowerCase();
+  if (
+    lower.includes("unique") ||
+    lower.includes("duplicate") ||
+    lower.includes("business_slug") ||
+    lower.includes("already exists")
+  ) {
+    return "This business name is already used. Please choose a slightly different name.";
+  }
+  if (lower.includes("not authorized") || lower.includes("not authenticated")) {
+    return "You need to be logged in to save settings. Please refresh and try again.";
+  }
+  if (lower.includes("network") || lower.includes("fetch")) {
+    return "Could not connect to the server. Please check your internet connection and try again.";
+  }
+  return "Something went wrong. Please try again.";
+}
+
 interface SettingsFormProps {
   initialName: string;
   initialGoogleLink: string;
@@ -47,7 +67,7 @@ export function SettingsForm({
     } else {
       setMessage({
         type: "error",
-        text: result.error || "Failed to save settings.",
+        text: friendlyError(result.error),
       });
     }
   }
