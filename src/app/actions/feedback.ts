@@ -57,6 +57,14 @@ export async function updateFeedbackStatus(
 ) {
   const supabase = await createClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
+
   const { error } = await supabase
     .from("feedbacks")
     .update({ status })
@@ -74,6 +82,14 @@ export async function updateFeedbackNote(
   internal_note: string,
 ) {
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
 
   const { error } = await supabase
     .from("feedbacks")
