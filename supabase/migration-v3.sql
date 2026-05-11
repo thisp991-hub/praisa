@@ -123,7 +123,8 @@ BEGIN
       used_by_email = NULL,
       used_by_user_id = NULL
   WHERE code = p_code
-    AND used_by_email = p_email;
+    AND used_by_email = p_email
+    AND used_by_user_id IS NULL;
 END;
 $$;
 
