@@ -47,6 +47,9 @@ export async function getBusinessBySlug(slug: string) {
     business_slug: string;
     google_review_link: string | null;
     logo_url: string | null;
+    subscription_status: string;
+    trial_ends_at: string | null;
+    paid_until: string | null;
     created_at: string;
   };
 }

@@ -18,7 +18,24 @@ export interface BusinessProfile {
   business_slug: string;
   google_review_link: string | null;
   logo_url: string | null;
+  subscription_status: string;
+  trial_started_at: string | null;
+  trial_ends_at: string | null;
+  paid_until: string | null;
+  plan: string;
   created_at: string;
+}
+
+export interface AccessCode {
+  id: string;
+  code: string;
+  client_name: string | null;
+  is_used: boolean;
+  used_by_email: string | null;
+  used_by_user_id: string | null;
+  expires_at: string | null;
+  created_at: string;
+  created_by: string | null;
 }
 
 export interface SavedReply {

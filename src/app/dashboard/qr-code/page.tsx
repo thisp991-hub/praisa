@@ -1,7 +1,28 @@
 import { getBusinessProfile } from "@/app/actions/business";
+import { getCurrentUser, getBusinessProfileWithSubscription } from "@/app/actions/auth";
+import { getSubscriptionState, isAccountActive } from "@/lib/subscription";
+import { TrialBanner } from "@/components/trial-banner";
+import { RenewalMessage } from "@/components/renewal-message";
 import { QRCodeGenerator } from "./qr-generator";
 
 export default async function QRCodePage() {
+  const user = await getCurrentUser();
+  const fullProfile = await getBusinessProfileWithSubscription();
+  const subState = getSubscriptionState(fullProfile, user?.isAdmin ?? false);
+  const active = isAccountActive(subState);
+
+  if (!active) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">QR Code</h1>
+        <div className="mt-4">
+          <TrialBanner state={subState} />
+        </div>
+        <RenewalMessage />
+      </div>
+    );
+  }
+
   const profile = await getBusinessProfile();
 
   return (

@@ -1,8 +1,29 @@
 import { getFeedbacks } from "@/app/actions/get-feedbacks";
 import { getBusinessProfile } from "@/app/actions/business";
+import { getCurrentUser, getBusinessProfileWithSubscription } from "@/app/actions/auth";
+import { getSubscriptionState, isAccountActive } from "@/lib/subscription";
+import { TrialBanner } from "@/components/trial-banner";
+import { RenewalMessage } from "@/components/renewal-message";
 import { FeedbackList } from "./feedback-client";
 
 export default async function FeedbackPage() {
+  const user = await getCurrentUser();
+  const fullProfile = await getBusinessProfileWithSubscription();
+  const subState = getSubscriptionState(fullProfile, user?.isAdmin ?? false);
+  const active = isAccountActive(subState);
+
+  if (!active) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Feedback</h1>
+        <div className="mt-4">
+          <TrialBanner state={subState} />
+        </div>
+        <RenewalMessage />
+      </div>
+    );
+  }
+
   const profile = await getBusinessProfile();
   const feedbacks = await getFeedbacks();
 

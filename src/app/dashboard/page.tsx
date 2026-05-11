@@ -1,4 +1,8 @@
 import { getFeedbacks } from "@/app/actions/get-feedbacks";
+import { getCurrentUser, getBusinessProfileWithSubscription } from "@/app/actions/auth";
+import { getSubscriptionState, isAccountActive } from "@/lib/subscription";
+import { TrialBanner } from "@/components/trial-banner";
+import { RenewalMessage } from "@/components/renewal-message";
 import {
   MessageSquare,
   Star,
@@ -56,6 +60,23 @@ function getRecommendation(
 }
 
 export default async function DashboardPage() {
+  const user = await getCurrentUser();
+  const profile = await getBusinessProfileWithSubscription();
+  const subState = getSubscriptionState(profile, user?.isAdmin ?? false);
+  const active = isAccountActive(subState);
+
+  if (!active) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div className="mt-4">
+          <TrialBanner state={subState} />
+        </div>
+        <RenewalMessage />
+      </div>
+    );
+  }
+
   const feedbacks = await getFeedbacks();
 
   const total = feedbacks.length;
@@ -129,7 +150,11 @@ export default async function DashboardPage() {
         Your feedback overview at a glance.
       </p>
 
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-4">
+        <TrialBanner state={subState} />
+      </div>
+
+      <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <div
             key={stat.label}

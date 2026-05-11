@@ -10,6 +10,7 @@ import {
   Sparkles,
   Settings,
   LogOut,
+  Shield,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -22,7 +23,11 @@ const navItems = [
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  isAdmin?: boolean;
+}
+
+export function Sidebar({ isAdmin = false }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -33,6 +38,10 @@ export function Sidebar() {
     router.refresh();
   }
 
+  const allNavItems = isAdmin
+    ? [...navItems, { href: "/dashboard/admin", label: "Admin", icon: Shield }]
+    : navItems;
+
   return (
     <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
       <div className="flex h-16 items-center px-6">
@@ -42,7 +51,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-4">
-        {navItems.map((item) => {
+        {allNavItems.map((item) => {
           const isActive =
             pathname === item.href ||
             (item.href !== "/dashboard" && pathname.startsWith(item.href));
