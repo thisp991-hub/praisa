@@ -31,6 +31,21 @@ export function TrialBanner({ state }: TrialBannerProps) {
     );
   }
 
+  if (state.status === "no_profile") {
+    return (
+      <div className="mb-6 flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+        <Clock className="h-5 w-5 text-blue-600" />
+        <p className="text-sm font-medium text-blue-800">
+          Welcome! Go to{" "}
+          <a href="/dashboard/settings" className="underline hover:no-underline">
+            Settings
+          </a>{" "}
+          to set up your business profile.
+        </p>
+      </div>
+    );
+  }
+
   if (state.status === "paid_active") {
     return (
       <div className="mb-6 flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3">

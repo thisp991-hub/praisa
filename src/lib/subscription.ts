@@ -4,7 +4,8 @@ export type SubscriptionState =
   | { status: "trial_active"; daysRemaining: number }
   | { status: "paid_active"; paidUntil: string }
   | { status: "expired" }
-  | { status: "admin" };
+  | { status: "admin" }
+  | { status: "no_profile" };
 
 export function getSubscriptionState(
   profile: BusinessProfile | null,
@@ -15,7 +16,7 @@ export function getSubscriptionState(
   }
 
   if (!profile) {
-    return { status: "expired" };
+    return { status: "no_profile" };
   }
 
   const now = new Date();
@@ -52,6 +53,7 @@ export function isAccountActive(state: SubscriptionState): boolean {
   return (
     state.status === "admin" ||
     state.status === "trial_active" ||
-    state.status === "paid_active"
+    state.status === "paid_active" ||
+    state.status === "no_profile"
   );
 }
