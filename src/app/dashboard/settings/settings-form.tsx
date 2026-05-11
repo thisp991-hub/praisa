@@ -27,16 +27,19 @@ function friendlyError(raw: string | undefined): string {
 interface SettingsFormProps {
   initialName: string;
   initialGoogleLink: string;
+  initialLogoUrl: string;
   currentSlug: string | null;
 }
 
 export function SettingsForm({
   initialName,
   initialGoogleLink,
+  initialLogoUrl,
   currentSlug,
 }: SettingsFormProps) {
   const [businessName, setBusinessName] = useState(initialName);
   const [googleReviewLink, setGoogleReviewLink] = useState(initialGoogleLink);
+  const [logoUrl, setLogoUrl] = useState(initialLogoUrl);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
@@ -58,6 +61,7 @@ export function SettingsForm({
     const result = await saveBusinessProfile({
       business_name: businessName.trim(),
       google_review_link: googleReviewLink.trim(),
+      logo_url: logoUrl.trim(),
     });
 
     setSaving(false);
@@ -114,6 +118,28 @@ export function SettingsForm({
 
       <div>
         <label
+          htmlFor="logoUrl"
+          className="mb-1 block text-sm font-medium text-gray-700"
+        >
+          Business Logo URL{" "}
+          <span className="text-gray-400">(optional)</span>
+        </label>
+        <input
+          id="logoUrl"
+          type="url"
+          value={logoUrl}
+          onChange={(e) => setLogoUrl(e.target.value)}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          placeholder="https://example.com/your-logo.png"
+        />
+        <p className="mt-1 text-xs text-gray-500">
+          Upload your logo to any image hosting service (e.g. Imgur, Cloudinary)
+          and paste the direct URL here. It will appear on your feedback page.
+        </p>
+      </div>
+
+      <div>
+        <label
           htmlFor="googleReviewLink"
           className="mb-1 block text-sm font-medium text-gray-700"
         >
@@ -131,6 +157,19 @@ export function SettingsForm({
         <p className="mt-1 text-xs text-gray-500">
           Customers who rate 4-5 stars will be redirected here.
         </p>
+        <div className="mt-2 rounded-lg bg-blue-50 p-3">
+          <p className="text-xs font-medium text-blue-700">
+            How to find your Google Review link:
+          </p>
+          <ol className="mt-1 list-inside list-decimal text-xs text-blue-600 space-y-0.5">
+            <li>Search for your business on Google Maps</li>
+            <li>Click on your business listing</li>
+            <li>
+              Click &quot;Ask for reviews&quot; or look for the share/review link
+            </li>
+            <li>Copy the link and paste it here</li>
+          </ol>
+        </div>
       </div>
 
       {currentSlug && (

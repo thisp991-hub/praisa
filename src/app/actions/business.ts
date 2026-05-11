@@ -2,8 +2,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { generateSlug } from "@/lib/utils";
+import type { BusinessProfile } from "@/lib/types";
 
-export async function getBusinessProfile() {
+export async function getBusinessProfile(): Promise<BusinessProfile | null> {
   const supabase = await createClient();
 
   const {
@@ -20,19 +21,13 @@ export async function getBusinessProfile() {
     .eq("user_id", user.id)
     .single();
 
-  return data as {
-    id: string;
-    user_id: string;
-    business_name: string;
-    business_slug: string;
-    google_review_link: string | null;
-    created_at: string;
-  } | null;
+  return (data as BusinessProfile) || null;
 }
 
 export async function saveBusinessProfile(formData: {
   business_name: string;
   google_review_link: string;
+  logo_url?: string;
 }) {
   const supabase = await createClient();
 
@@ -67,6 +62,18 @@ export async function saveBusinessProfile(formData: {
       if (error) {
         return { success: false, error: error.message };
       }
+
+      // Update logo_url separately (not part of the RPC)
+      if (formData.logo_url !== undefined) {
+        const { error: logoError } = await supabase
+          .from("business_profiles")
+          .update({ logo_url: formData.logo_url || null })
+          .eq("id", existing.id);
+
+        if (logoError) {
+          return { success: false, error: logoError.message };
+        }
+      }
     } else {
       const { error } = await supabase
         .from("business_profiles")
@@ -74,6 +81,7 @@ export async function saveBusinessProfile(formData: {
           business_name: formData.business_name,
           business_slug: slug,
           google_review_link: formData.google_review_link || null,
+          logo_url: formData.logo_url || null,
         })
         .eq("id", existing.id);
 
@@ -87,6 +95,7 @@ export async function saveBusinessProfile(formData: {
       business_name: formData.business_name,
       business_slug: slug,
       google_review_link: formData.google_review_link || null,
+      logo_url: formData.logo_url || null,
     });
 
     if (error) {

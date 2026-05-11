@@ -8,6 +8,7 @@ create table if not exists business_profiles (
   business_name text not null,
   business_slug text unique not null,
   google_review_link text,
+  logo_url text,
   created_at timestamptz default now() not null,
   unique(user_id)
 );
@@ -20,6 +21,9 @@ create table if not exists feedbacks (
   feedback_text text,
   name text,
   email text,
+  category text,
+  status text default 'new' not null,
+  internal_note text,
   created_at timestamptz default now() not null
 );
 
@@ -97,6 +101,36 @@ create policy "Users can delete own replies"
   on saved_replies for delete
   using (auth.uid() = user_id);
 
+-- Customers table
+create table if not exists customers (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  business_slug text not null,
+  name text not null,
+  phone text,
+  email text,
+  status text default 'not_requested' not null,
+  created_at timestamptz default now() not null
+);
+
+alter table customers enable row level security;
+
+create policy "Users can view own customers"
+  on customers for select
+  using (auth.uid() = user_id);
+
+create policy "Users can insert own customers"
+  on customers for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can update own customers"
+  on customers for update
+  using (auth.uid() = user_id);
+
+create policy "Users can delete own customers"
+  on customers for delete
+  using (auth.uid() = user_id);
+
 -- RPC for atomic slug migration (bypasses RLS timing issues)
 create or replace function migrate_business_slug(
   p_profile_id uuid,
@@ -117,6 +151,7 @@ begin
   end if;
 
   update feedbacks set business_slug = p_new_slug where business_slug = p_old_slug;
+  update customers set business_slug = p_new_slug where business_slug = p_old_slug;
   update business_profiles
     set business_name = p_business_name,
         business_slug = p_new_slug,
@@ -130,3 +165,5 @@ create index if not exists idx_feedbacks_business_slug on feedbacks(business_slu
 create index if not exists idx_business_profiles_slug on business_profiles(business_slug);
 create index if not exists idx_business_profiles_user_id on business_profiles(user_id);
 create index if not exists idx_saved_replies_user_id on saved_replies(user_id);
+create index if not exists idx_customers_user_id on customers(user_id);
+create index if not exists idx_customers_business_slug on customers(business_slug);
