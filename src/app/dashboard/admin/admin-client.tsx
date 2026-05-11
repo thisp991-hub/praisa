@@ -420,7 +420,7 @@ function AccessCodesTable({
 
     setCodes((prev) => [
       {
-        id: crypto.randomUUID(),
+        id: result.id || crypto.randomUUID(),
         code: newCode.trim(),
         client_name: clientName.trim() || null,
         is_used: false,

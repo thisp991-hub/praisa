@@ -103,12 +103,16 @@ export async function createAccessCode(formData: {
     return { success: false, error: "Not authorized" };
   }
 
-  const { error } = await supabase.from("access_codes").insert({
-    code: formData.code,
-    client_name: formData.client_name || null,
-    expires_at: formData.expires_at || null,
-    created_by: user.id,
-  });
+  const { data, error } = await supabase
+    .from("access_codes")
+    .insert({
+      code: formData.code,
+      client_name: formData.client_name || null,
+      expires_at: formData.expires_at || null,
+      created_by: user.id,
+    })
+    .select("id")
+    .single();
 
   if (error) {
     if (error.message.includes("duplicate") || error.message.includes("unique")) {
@@ -117,7 +121,7 @@ export async function createAccessCode(formData: {
     return { success: false, error: error.message };
   }
 
-  return { success: true };
+  return { success: true, id: data.id as string };
 }
 
 export async function deleteAccessCode(codeId: string) {
