@@ -80,11 +80,12 @@ $$;
 
 -- =============================================================
 -- 4. RPC: claim_access_code (atomic validate + mark used)
+--    p_user_id is nullable so code can be claimed before signup
 -- =============================================================
 CREATE OR REPLACE FUNCTION claim_access_code(
   p_code text,
   p_email text,
-  p_user_id uuid
+  p_user_id uuid DEFAULT NULL
 )
 RETURNS boolean
 LANGUAGE plpgsql
@@ -102,6 +103,48 @@ BEGIN
     AND (expires_at IS NULL OR expires_at > now());
   GET DIAGNOSTICS v_rows = ROW_COUNT;
   RETURN v_rows > 0;
+END;
+$$;
+
+-- =============================================================
+-- 4b. RPC: release_access_code (rollback if signup fails)
+-- =============================================================
+CREATE OR REPLACE FUNCTION release_access_code(
+  p_code text,
+  p_email text
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  UPDATE access_codes
+  SET is_used = false,
+      used_by_email = NULL,
+      used_by_user_id = NULL
+  WHERE code = p_code
+    AND used_by_email = p_email;
+END;
+$$;
+
+-- =============================================================
+-- 4c. RPC: finalize_access_code (set user_id after signup)
+-- =============================================================
+CREATE OR REPLACE FUNCTION finalize_access_code(
+  p_code text,
+  p_email text,
+  p_user_id uuid
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  UPDATE access_codes
+  SET used_by_user_id = p_user_id
+  WHERE code = p_code
+    AND used_by_email = p_email
+    AND is_used = true;
 END;
 $$;
 

@@ -41,16 +41,31 @@ export async function updateSubscriptionStatus(
     return { success: false, error: "Not authorized" };
   }
 
+  const updateData: Record<string, unknown> = { subscription_status: status };
+
+  if (status === "trial") {
+    const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    updateData.trial_started_at = new Date().toISOString();
+    updateData.trial_ends_at = trialEnd.toISOString();
+  } else if (status === "active") {
+    const paidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    updateData.paid_until = paidUntil.toISOString();
+  }
+
   const { error } = await supabase
     .from("business_profiles")
-    .update({ subscription_status: status })
+    .update(updateData)
     .eq("id", profileId);
 
   if (error) {
     return { success: false, error: error.message };
   }
 
-  return { success: true };
+  return {
+    success: true,
+    trial_ends_at: updateData.trial_ends_at as string | undefined,
+    paid_until: updateData.paid_until as string | undefined,
+  };
 }
 
 export async function extendTrial(profileId: string, days: number) {

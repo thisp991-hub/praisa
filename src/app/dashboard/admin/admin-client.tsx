@@ -89,7 +89,18 @@ function ClientsTable({
     } else {
       setProfiles((prev) =>
         prev.map((p) =>
-          p.id === profileId ? { ...p, subscription_status: status } : p,
+          p.id === profileId
+            ? {
+                ...p,
+                subscription_status: status,
+                ...(result.trial_ends_at
+                  ? { trial_ends_at: result.trial_ends_at }
+                  : {}),
+                ...(result.paid_until
+                  ? { paid_until: result.paid_until }
+                  : {}),
+              }
+            : p,
         ),
       );
     }

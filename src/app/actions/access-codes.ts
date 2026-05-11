@@ -20,13 +20,11 @@ export async function validateAccessCode(code: string): Promise<boolean> {
 export async function claimAccessCode(
   code: string,
   email: string,
-  userId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("claim_access_code", {
     p_code: code,
     p_email: email,
-    p_user_id: userId,
   });
 
   if (error) {
@@ -41,6 +39,30 @@ export async function claimAccessCode(
   }
 
   return { success: true };
+}
+
+export async function releaseAccessCode(
+  code: string,
+  email: string,
+): Promise<void> {
+  const supabase = await createClient();
+  await supabase.rpc("release_access_code", {
+    p_code: code,
+    p_email: email,
+  });
+}
+
+export async function finalizeAccessCode(
+  code: string,
+  email: string,
+  userId: string,
+): Promise<void> {
+  const supabase = await createClient();
+  await supabase.rpc("finalize_access_code", {
+    p_code: code,
+    p_email: email,
+    p_user_id: userId,
+  });
 }
 
 export async function getAccessCodes(): Promise<AccessCode[]> {

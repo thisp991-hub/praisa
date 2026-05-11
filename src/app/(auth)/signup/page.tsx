@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { validateAccessCode, claimAccessCode } from "@/app/actions/access-codes";
+import {
+  validateAccessCode,
+  claimAccessCode,
+  releaseAccessCode,
+  finalizeAccessCode,
+} from "@/app/actions/access-codes";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -48,6 +53,15 @@ export default function SignupPage() {
       return;
     }
 
+    const claimResult = await claimAccessCode(accessCode.trim(), email);
+    if (!claimResult.success) {
+      setError(
+        "This access code has already been used. Please contact Praisa for a new code.",
+      );
+      setLoading(false);
+      return;
+    }
+
     const supabase = createClient();
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
@@ -55,20 +69,14 @@ export default function SignupPage() {
     });
 
     if (signUpError) {
+      await releaseAccessCode(accessCode.trim(), email);
       setError(signUpError.message);
       setLoading(false);
       return;
     }
 
     if (data.user) {
-      const claimResult = await claimAccessCode(accessCode.trim(), email, data.user.id);
-      if (!claimResult.success) {
-        setError(
-          "This access code has already been used. Please contact Praisa for a new code.",
-        );
-        setLoading(false);
-        return;
-      }
+      await finalizeAccessCode(accessCode.trim(), email, data.user.id);
     }
 
     router.push("/dashboard");
