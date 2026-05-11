@@ -93,7 +93,7 @@ export async function extendTrial(profileId: string, days: number) {
     return { success: false, error: error.message };
   }
 
-  return { success: true };
+  return { success: true, trial_ends_at: newEnd.toISOString() };
 }
 
 export async function activateForDays(profileId: string, days: number) {

@@ -103,14 +103,13 @@ function ClientsTable({
     if (!result.success) {
       setError(result.error || "Failed to extend trial");
     } else {
-      const newEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
       setProfiles((prev) =>
         prev.map((p) =>
           p.id === profileId
             ? {
                 ...p,
                 subscription_status: "trial",
-                trial_ends_at: newEnd.toISOString(),
+                trial_ends_at: result.trial_ends_at ?? p.trial_ends_at,
               }
             : p,
         ),

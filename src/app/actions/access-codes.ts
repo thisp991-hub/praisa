@@ -17,13 +17,13 @@ export async function validateAccessCode(code: string): Promise<boolean> {
   return data === true;
 }
 
-export async function markAccessCodeUsed(
+export async function claimAccessCode(
   code: string,
   email: string,
   userId: string,
-) {
+): Promise<{ success: boolean; error?: string }> {
   const supabase = await createClient();
-  const { error } = await supabase.rpc("mark_access_code_used", {
+  const { data, error } = await supabase.rpc("claim_access_code", {
     p_code: code,
     p_email: email,
     p_user_id: userId,
@@ -31,6 +31,13 @@ export async function markAccessCodeUsed(
 
   if (error) {
     return { success: false, error: error.message };
+  }
+
+  if (data !== true) {
+    return {
+      success: false,
+      error: "This access code has already been used or is no longer valid.",
+    };
   }
 
   return { success: true };

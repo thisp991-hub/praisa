@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { validateAccessCode, markAccessCodeUsed } from "@/app/actions/access-codes";
+import { validateAccessCode, claimAccessCode } from "@/app/actions/access-codes";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -61,7 +61,14 @@ export default function SignupPage() {
     }
 
     if (data.user) {
-      await markAccessCodeUsed(accessCode.trim(), email, data.user.id);
+      const claimResult = await claimAccessCode(accessCode.trim(), email, data.user.id);
+      if (!claimResult.success) {
+        setError(
+          "This access code has already been used. Please contact Praisa for a new code.",
+        );
+        setLoading(false);
+        return;
+      }
     }
 
     router.push("/dashboard");

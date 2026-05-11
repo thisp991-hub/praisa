@@ -79,24 +79,29 @@ END;
 $$;
 
 -- =============================================================
--- 4. RPC: mark_access_code_used (called after successful signup)
+-- 4. RPC: claim_access_code (atomic validate + mark used)
 -- =============================================================
-CREATE OR REPLACE FUNCTION mark_access_code_used(
+CREATE OR REPLACE FUNCTION claim_access_code(
   p_code text,
   p_email text,
   p_user_id uuid
 )
-RETURNS void
+RETURNS boolean
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+DECLARE
+  v_rows integer;
 BEGIN
   UPDATE access_codes
   SET is_used = true,
       used_by_email = p_email,
       used_by_user_id = p_user_id
   WHERE code = p_code
-    AND is_used = false;
+    AND is_used = false
+    AND (expires_at IS NULL OR expires_at > now());
+  GET DIAGNOSTICS v_rows = ROW_COUNT;
+  RETURN v_rows > 0;
 END;
 $$;
 
