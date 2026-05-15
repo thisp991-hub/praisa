@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Star, ShieldCheck, QrCode } from "lucide-react";
+import { Star, ShieldCheck, QrCode, MessageCircle, Mail } from "lucide-react";
+import { SUPPORT_EMAIL, WHATSAPP_LINK } from "@/lib/admin";
 
 export default function Home() {
   return (
@@ -21,7 +22,7 @@ export default function Home() {
               href="/signup"
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
             >
-              Get Started
+              Start 7-Day Trial
             </Link>
           </nav>
         </div>
@@ -43,14 +44,41 @@ export default function Home() {
             href="/signup"
             className="rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-dark"
           >
-            Start Free Trial
+            Start 7-Day Trial
           </Link>
-          <Link
-            href="#how-it-works"
-            className="rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+          <a
+            href={WHATSAPP_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
           >
-            See How It Works
-          </Link>
+            <MessageCircle className="h-4 w-4" />
+            Request Demo
+          </a>
+        </div>
+        <div className="mt-6 rounded-lg border border-blue-100 bg-blue-50 px-6 py-3">
+          <p className="text-sm text-blue-800">
+            Praisa is invite-only during beta. Contact us to get your access
+            code.
+          </p>
+          <div className="mt-2 flex items-center justify-center gap-4">
+            <a
+              href={`mailto:${SUPPORT_EMAIL}`}
+              className="inline-flex items-center gap-1 text-sm font-medium text-blue-700 hover:underline"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              {SUPPORT_EMAIL}
+            </a>
+            <a
+              href={WHATSAPP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-sm font-medium text-green-700 hover:underline"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+              WhatsApp
+            </a>
+          </div>
         </div>
       </section>
 
